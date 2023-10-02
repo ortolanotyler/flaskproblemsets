@@ -1,0 +1,59 @@
+##app.py 
+
+from flask import Flask, render_template, request
+from flask_debugtoolbar import DebugToolbarExtension
+from stories import story as my_story
+
+app = Flask(__name__)
+app.config['SECRET_KEY'] = "my_secret_key"
+
+debug = DebugToolbarExtension(app)
+
+@app.route("/")
+def display_questions():
+    """Display a form to collect user input."""
+
+    user_prompts = my_story.prompts
+
+    return render_template("question_form.html", prompts=user_prompts)
+
+@app.route("/generate_story")
+def generate_and_show_story():
+    """Generate and display the story result."""
+
+    user_input = request.args
+
+    generated_text = my_story.generate(user_input)
+
+    return render_template("story_result.html", text=generated_text)
+
+#questionshtml 
+<!doctype html>
+<html>
+<head>
+  <title>Madlibs</title>
+</head>
+<body>
+  <h1>Madlibs</h1>
+  <form action="/story">
+    {% for prompt in prompts %}
+      <p>{{ prompt }}:
+        <input name="{{ prompt }}">
+      </p>
+    {% endfor %}
+    <button>Submit</button>
+  </form>
+</body>
+</html>
+
+#storyhtml
+<!doctype html>
+<html>
+<head>
+  <title>Madlibs</title>
+</head>
+<body>
+  <h1>Your Story</h1>
+  <p>{{ text }}</p>
+</body>
+</html>
